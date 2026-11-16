@@ -1,0 +1,22 @@
+{
+  "name": "node-service",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@cratis/chronicle": "^6.62.0",
+    "@cratis/fundamentals": "^7.33.1",
+    "reflect-metadata": "^0.2.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0",
+    "vitest": "^3.0.0"
+  }
+}

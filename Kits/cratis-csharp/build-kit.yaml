@@ -1,0 +1,42 @@
+kitVersion: "1"
+name: cratis-csharp
+version: 1.0.0
+description: Event-sourced .NET applications on Cratis Arc and Chronicle, with a React frontend on Cratis Components.
+contract:
+  versions: ["1"]
+screenplay:
+  schemaVersions: ">=38"
+sliceTypes: [stateChange, stateView, automation, translation]
+ui: true
+scaffold:
+  path: ./scaffold
+  commands:
+    - dotnet restore CratisApp.slnx
+    - npm install
+instructions: ./AGENTS.md
+skills: ./skills
+prompt: ./build-slice.md
+verify:
+  - dotnet build $(ls *.slnx *.sln 2>/dev/null | head -n 1) -warnaserror
+  - dotnet test $(ls *.slnx *.sln 2>/dev/null | head -n 1) --no-build --filter "FullyQualifiedName~{slice}" -- RunConfiguration.TreatNoTestsAsError=true
+git:
+  branch: "studio/{feature}"
+  commit: "Build {slice}"
+permissions:
+  paths: ["**"]
+  commands:
+    - dotnet build
+    - dotnet test
+    - dotnet restore
+    - npm install
+    - npx tsc
+    - git status
+    - git diff
+existingCodebase:
+  learn: ./learn-conventions.md
+  conventions: .cratis/build/conventions.md
+requires:
+  - command: dotnet
+    version: ">=11"
+  - command: node
+    version: ">=20"

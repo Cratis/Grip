@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <AssemblyName>Cratis.Grip.Kits</AssemblyName>
+        <RootNamespace>Cratis.Grip.Kits</RootNamespace>
+        <PackageId>Cratis.Grip.Kits</PackageId>
+        <Description>The build kit format of Cratis Studio builders: the build-kit.yaml manifest schema, validation of a whole kit, the placeholders a host fills, and reproducible kit archives.</Description>
+        <PackageTags>cratis;grip;studio;builder;build-kit;json-schema</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="JsonSchema.Net" />
+        <PackageReference Include="YamlDotNet" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="Schemas/*.schema.json" LogicalName="Cratis.Grip.Kits.%(Filename)%(Extension)" />
+        <!-- The reference build kits: every folder under Kits/ at the repository root is one kit. -->
+        <EmbeddedResource Include="../../../Kits/**/*" Exclude="../../../Kits/README.md" LogicalName="Cratis.Grip.Kits.Reference/%(RecursiveDir)%(Filename)%(Extension)" />
+    </ItemGroup>
+</Project>

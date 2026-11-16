@@ -1,0 +1,164 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:cratis:studio:builders:build-order:3",
+    "title": "Build order",
+    "description": "What Studio hands a builder: the slices to build, described in Screenplay, with the context the builder needs, or the code of deleted slices to remove. Version 3. An order never carries a credential; repository access is handed over separately.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["contractVersion", "orderId", "issued", "deadline", "part", "scope", "model", "changes", "specifications", "context"],
+    "if": { "properties": { "part": { "const": "removal" } } },
+    "then": {
+        "properties": {
+            "scope": { "properties": { "slices": { "maxItems": 0 } } },
+            "changes": { "minItems": 1, "items": { "properties": { "kind": { "const": "removed" } } } }
+        }
+    },
+    "else": { "properties": { "scope": { "properties": { "slices": { "minItems": 1 } } } } },
+    "properties": {
+        "contractVersion": { "const": "3", "description": "The contract version this order is written in." },
+        "orderId": { "$ref": "#/$defs/id", "description": "Identifies this order; the outcome answers it by this id." },
+        "issued": { "type": "string", "format": "date-time" },
+        "deadline": { "type": "string", "format": "date-time", "description": "When Studio stops waiting for an outcome." },
+        "part": { "enum": ["backend", "ui", "removal"], "description": "What to build: the backend of the slices, their user interface once the backend is built, or, for 'removal', nothing: remove what was built for the slices listed as 'removed' in changes." },
+        "scope": { "$ref": "#/$defs/scope" },
+        "model": { "$ref": "#/$defs/model" },
+        "changes": { "type": "array", "items": { "$ref": "#/$defs/sliceChange" }, "description": "What changed per target slice since the builder's last accepted revision, plus the slices deleted from the feature whose code is still to be removed. Every target is 'added' when there is none. A 'removal' order lists only 'removed' changes." },
+        "specifications": { "type": "array", "items": { "$ref": "#/$defs/acceptanceCriterion" }, "description": "The target slices' specifications, as acceptance criteria." },
+        "context": { "$ref": "#/$defs/context" },
+        "backend": { "type": "array", "items": { "$ref": "#/$defs/backend" }, "description": "For a 'ui' order: what the backend builder built for each target slice and the API it exposes. Absent for a 'backend' order." }
+    },
+    "$defs": {
+        "id": { "type": "string", "format": "uuid", "description": "A stable identifier that survives renames." },
+        "text": { "type": "string", "minLength": 1 },
+        "backend": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["sliceId", "files", "api"],
+            "properties": {
+                "sliceId": { "$ref": "#/$defs/id" },
+                "commit": { "$ref": "#/$defs/text" },
+                "branch": { "$ref": "#/$defs/text" },
+                "pullRequest": { "$ref": "#/$defs/text" },
+                "files": { "type": "array", "items": { "$ref": "#/$defs/text" }, "description": "The files the backend builder owns, relative to the repository root." },
+                "api": { "type": "array", "items": { "$ref": "#/$defs/apiOperation" }, "description": "The commands and queries the backend exposes for the slice." }
+            }
+        },
+        "apiOperation": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "name"],
+            "properties": {
+                "kind": { "enum": ["command", "query"] },
+                "name": { "$ref": "#/$defs/text", "description": "The command or query as the model names it." },
+                "method": { "$ref": "#/$defs/text", "description": "The HTTP method, when the backend builder reported one." },
+                "route": { "$ref": "#/$defs/text", "description": "The route, when the backend builder reported one." }
+            }
+        },
+        "scope": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["application", "feature", "slices"],
+            "properties": {
+                "application": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["id", "name"],
+                    "properties": { "id": { "$ref": "#/$defs/id" }, "name": { "$ref": "#/$defs/text" } }
+                },
+                "feature": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["id", "name", "path"],
+                    "properties": {
+                        "id": { "$ref": "#/$defs/id" },
+                        "name": { "$ref": "#/$defs/text" },
+                        "path": { "type": "array", "items": { "$ref": "#/$defs/text" }, "description": "The module and any parent features, outermost first." }
+                    }
+                },
+                "slices": { "type": "array", "items": { "$ref": "#/$defs/slice" }, "description": "The slices to build; empty for a 'removal' order." }
+            }
+        },
+        "slice": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "name", "type", "status"],
+            "properties": {
+                "id": { "$ref": "#/$defs/id" },
+                "name": { "$ref": "#/$defs/text" },
+                "type": { "enum": ["stateChange", "stateView", "automation", "translation"] },
+                "status": { "enum": ["notStarted", "draft", "analysis", "readyForImplementation", "inProgress", "readyForReview", "done", "blocked", "waiting"] }
+            }
+        },
+        "model": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["language", "schemaVersion", "revision", "documents"],
+            "properties": {
+                "language": { "const": "screenplay" },
+                "schemaVersion": { "type": "string", "description": "The schema version of the canonical model, as Screenplay publishes it." },
+                "revision": { "$ref": "#/$defs/text", "description": "The model revision the order was composed from." },
+                "documents": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": ["path", "content"],
+                        "properties": { "path": { "$ref": "#/$defs/text" }, "content": { "type": "string" } }
+                    },
+                    "description": "The Screenplay .play documents."
+                },
+                "canonical": { "type": ["object", "null"], "description": "The canonical executable model as Screenplay serializes it, valid against Screenplay's schema for schemaVersion." }
+            }
+        },
+        "sliceChange": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["sliceId", "kind", "declarations"],
+            "properties": {
+                "sliceId": { "$ref": "#/$defs/id" },
+                "kind": { "enum": ["added", "changed", "renamed", "moved", "removed"] },
+                "previousName": { "type": ["string", "null"] },
+                "declarations": { "type": "array", "items": { "$ref": "#/$defs/text" }, "description": "The declarations of the slice that changed." }
+            }
+        },
+        "acceptanceCriterion": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["sliceId", "id", "name", "given", "then"],
+            "properties": {
+                "sliceId": { "$ref": "#/$defs/id" },
+                "id": { "$ref": "#/$defs/id" },
+                "name": { "$ref": "#/$defs/text" },
+                "given": { "type": "array", "items": { "$ref": "#/$defs/text" } },
+                "when": { "type": ["string", "null"] },
+                "then": { "type": "array", "items": { "$ref": "#/$defs/text" } }
+            }
+        },
+        "context": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["conventions", "hints", "feedback", "attempt"],
+            "properties": {
+                "conventions": { "type": "array", "items": { "$ref": "#/$defs/text" } },
+                "hints": { "type": "array", "items": { "$ref": "#/$defs/text" } },
+                "feedback": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": ["sliceId", "text", "occurred"],
+                        "properties": {
+                            "sliceId": { "$ref": "#/$defs/id" },
+                            "text": { "$ref": "#/$defs/text" },
+                            "occurred": { "type": "string", "format": "date-time" }
+                        }
+                    },
+                    "description": "Comments and feedback people left on the target slices."
+                },
+                "attempt": { "type": "integer", "minimum": 1 },
+                "previousFailure": { "type": ["string", "null"], "description": "Why the previous attempt failed, when this is a retry." }
+            }
+        }
+    }
+}

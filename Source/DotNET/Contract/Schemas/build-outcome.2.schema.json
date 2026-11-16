@@ -1,0 +1,115 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:cratis:studio:builders:build-outcome:2",
+    "title": "Build outcome",
+    "description": "What a builder answers a build order with: exactly one of built, blocked, failed or nothingToDo. Version 2.",
+    "type": "object",
+    "required": ["contractVersion", "orderId", "kind"],
+    "properties": {
+        "contractVersion": { "const": "2" },
+        "orderId": { "type": "string", "format": "uuid", "description": "The order this outcome answers." },
+        "kind": { "enum": ["built", "blocked", "failed", "nothingToDo"] }
+    },
+    "oneOf": [
+        { "$ref": "#/$defs/built" },
+        { "$ref": "#/$defs/blocked" },
+        { "$ref": "#/$defs/failed" },
+        { "$ref": "#/$defs/nothingToDo" }
+    ],
+    "$defs": {
+        "text": { "type": "string", "minLength": 1 },
+        "usage": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["inputTokens", "outputTokens"],
+            "description": "The tokens an agent builder used for this attempt, in total. Studio measures the time itself.",
+            "properties": {
+                "inputTokens": { "type": "integer", "minimum": 0 },
+                "outputTokens": { "type": "integer", "minimum": 0 }
+            }
+        },
+        "apiOperation": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "name"],
+            "properties": {
+                "kind": { "enum": ["command", "query"] },
+                "name": { "$ref": "#/$defs/text", "description": "The command or query as the model names it." },
+                "method": { "$ref": "#/$defs/text", "description": "The HTTP method the backend exposes it on." },
+                "route": { "$ref": "#/$defs/text", "description": "The route the backend exposes it on." }
+            }
+        },
+        "built": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "files", "specifications", "assumptions"],
+            "anyOf": [
+                { "required": ["commit"] },
+                { "required": ["branch"] },
+                { "required": ["pullRequest"] }
+            ],
+            "properties": {
+                "contractVersion": true,
+                "orderId": true,
+                "usage": { "$ref": "#/$defs/usage" },
+                "kind": { "const": "built" },
+                "commit": { "$ref": "#/$defs/text" },
+                "branch": { "$ref": "#/$defs/text" },
+                "pullRequest": { "$ref": "#/$defs/text" },
+                "files": { "type": "array", "items": { "$ref": "#/$defs/text" }, "description": "The files the builder owns, relative to the repository root." },
+                "specifications": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": ["id", "result"],
+                        "properties": {
+                            "id": { "type": "string", "format": "uuid", "description": "The specification id from the order." },
+                            "result": { "enum": ["passed", "failed", "notRun"] },
+                            "message": { "type": "string" }
+                        }
+                    }
+                },
+                "api": { "type": "array", "items": { "$ref": "#/$defs/apiOperation" }, "description": "The commands and queries a backend build exposes, handed to the builder of the user interface." },
+                "assumptions": { "type": "array", "items": { "$ref": "#/$defs/text" }, "description": "Assumptions the builder made where the order was silent." }
+            }
+        },
+        "blocked": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "reason", "questions"],
+            "properties": {
+                "contractVersion": true,
+                "orderId": true,
+                "usage": { "$ref": "#/$defs/usage" },
+                "kind": { "const": "blocked" },
+                "reason": { "$ref": "#/$defs/text" },
+                "questions": { "type": "array", "items": { "$ref": "#/$defs/text" }, "description": "The questions that need an answer before the slices can be built." }
+            }
+        },
+        "failed": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "error", "retryable"],
+            "properties": {
+                "contractVersion": true,
+                "orderId": true,
+                "usage": { "$ref": "#/$defs/usage" },
+                "kind": { "const": "failed" },
+                "error": { "$ref": "#/$defs/text" },
+                "retryable": { "type": "boolean", "description": "Whether trying the same order again can succeed." }
+            }
+        },
+        "nothingToDo": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind"],
+            "properties": {
+                "contractVersion": true,
+                "orderId": true,
+                "usage": { "$ref": "#/$defs/usage" },
+                "kind": { "const": "nothingToDo" }
+            }
+        }
+    }
+}

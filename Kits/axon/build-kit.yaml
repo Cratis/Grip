@@ -1,0 +1,31 @@
+kitVersion: "1"
+name: axon
+version: 1.0.0
+description: Event-sourced Java applications on Axon Framework, rendered from the Screenplay model by the Axon Stage renderer.
+contract:
+  versions: ["1"]
+screenplay:
+  schemaVersions: ">=38"
+sliceTypes: [stateChange, stateView, automation, translation]
+ui: false
+instructions: ./AGENTS.md
+skills: ./skills
+prompt: ./build-slice.md
+verify:
+  - ./mvnw -q -B test
+git:
+  branch: "studio/{feature}"
+  commit: "Build {slice}"
+permissions:
+  paths: ["src/**", "pom.xml", "screenplay/**"]
+  commands:
+    - ./mvnw
+    - mvn
+    - git status
+    - git diff
+existingCodebase:
+  learn: ./learn-conventions.md
+  conventions: .cratis/build/conventions.md
+requires:
+  - command: java
+    version: ">=21"

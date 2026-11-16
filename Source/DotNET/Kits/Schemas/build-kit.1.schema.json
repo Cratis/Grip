@@ -1,0 +1,140 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:cratis:studio:builders:build-kit:1",
+    "title": "Build kit manifest",
+    "description": "Describes a stack for a builder host: how a project is scaffolded, what the agent is told, how a slice is built and verified, and how the work lands in Git. Written as build-kit.yaml or build-kit.json at the root of the kit. Version 1.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["kitVersion", "name", "version", "description", "sliceTypes", "instructions", "prompt", "verify"],
+    "properties": {
+        "kitVersion": { "const": "1", "description": "The version of this manifest format." },
+        "name": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+            "maxLength": 64,
+            "description": "The kit's name, lowercase words joined by hyphens. Registered kits are installed by it."
+        },
+        "version": {
+            "type": "string",
+            "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9A-Za-z.-]+)?$",
+            "description": "The kit's own version, as semantic version."
+        },
+        "description": { "$ref": "#/$defs/text", "description": "One sentence on the stack the kit builds." },
+        "contract": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["versions"],
+            "properties": {
+                "versions": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": { "type": "string", "pattern": "^[0-9]+$" },
+                    "description": "The build order and outcome contract versions the kit's prompt is written for. Defaults to [\"1\"]."
+                }
+            }
+        },
+        "screenplay": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["schemaVersions"],
+            "properties": {
+                "schemaVersions": {
+                    "type": "string",
+                    "pattern": "^(>=|<=|>|<|=)?[0-9]+( (>=|<=|>|<)[0-9]+)?$",
+                    "description": "The compiled Screenplay model schema versions the kit understands, such as \">=38\" or \">=38 <50\"."
+                }
+            }
+        },
+        "sliceTypes": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "enum": ["stateChange", "stateView", "automation", "translation"] },
+            "description": "The slice types the kit builds. A builder host takes no order for another type."
+        },
+        "ui": { "type": "boolean", "default": false, "description": "Whether the kit also builds user interfaces (the ui part of an order)." },
+        "scaffold": {
+            "description": "How a new project is created: a folder of files copied into an empty project, commands run in it, or both.",
+            "oneOf": [
+                { "$ref": "#/$defs/path" },
+                {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "minProperties": 1,
+                    "properties": {
+                        "path": { "$ref": "#/$defs/path" },
+                        "commands": { "$ref": "#/$defs/commands" }
+                    }
+                }
+            ]
+        },
+        "instructions": { "$ref": "#/$defs/path", "description": "The stack instructions, a Markdown file. Installed in the form the chosen agent reads." },
+        "skills": { "$ref": "#/$defs/path", "description": "A folder of skills, one folder per skill holding a SKILL.md." },
+        "prompt": { "$ref": "#/$defs/path", "description": "The prompt template for one build order. Placeholders in braces are filled from the order." },
+        "verify": { "$ref": "#/$defs/commands", "description": "Commands the host runs after the agent is done, in order. A slice is reported built only when every one exits with 0." },
+        "git": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "branch": { "$ref": "#/$defs/template", "description": "The branch to build on, such as \"studio/{feature}\"." },
+                "commit": { "$ref": "#/$defs/template", "description": "The commit message, such as \"Build {slice}\"." }
+            }
+        },
+        "permissions": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "What the host allows when the agent asks for permission. Everything else is refused.",
+            "properties": {
+                "paths": { "type": "array", "items": { "$ref": "#/$defs/glob" }, "description": "Globs, relative to the project, the agent may write. Defaults to everything in the project." },
+                "commands": { "type": "array", "items": { "$ref": "#/$defs/text" }, "description": "Command prefixes the agent may run, such as \"dotnet build\". The verify commands are always allowed." }
+            }
+        },
+        "existingCodebase": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["learn", "conventions"],
+            "description": "How the kit builds into a project it did not scaffold: the agent learns the project's conventions once, records them, and every later build reads them.",
+            "properties": {
+                "learn": { "$ref": "#/$defs/path", "description": "The prompt that asks the agent to learn the project's conventions." },
+                "conventions": { "$ref": "#/$defs/projectPath", "description": "Where in the project the learned conventions are recorded, such as \".cratis/build/conventions.md\"." }
+            }
+        },
+        "requires": {
+            "type": "array",
+            "description": "Tools the host checks for before it builds.",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["command"],
+                "properties": {
+                    "command": { "type": "string", "pattern": "^[A-Za-z0-9._-]+$" },
+                    "version": { "type": "string", "pattern": "^(>=|<=|>|<|=)?[0-9]+(\\.[0-9]+){0,2}$" }
+                }
+            }
+        }
+    },
+    "$defs": {
+        "text": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "path": {
+            "type": "string",
+            "pattern": "^\\./(?!.*(^|/)\\.\\.(/|$))[^\\\\]+$",
+            "description": "A path inside the kit, starting with ./ and never leaving it."
+        },
+        "projectPath": {
+            "type": "string",
+            "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$))[^\\\\]+$",
+            "description": "A path inside the project, relative, never leaving it."
+        },
+        "glob": {
+            "type": "string",
+            "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$))[^\\\\]+$"
+        },
+        "template": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "commands": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "$ref": "#/$defs/text" }
+        }
+    }
+}

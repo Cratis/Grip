@@ -1,0 +1,68 @@
+name: Build
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - "**"
+
+permissions:
+  contents: read
+
+jobs:
+  libraries:
+    name: Libraries (${{ matrix.configuration }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      # The libraries target net10.0 and net11.0, so both runtimes are needed to run their specifications.
+      - name: Setup .NET
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          global-json-file: global.json
+          dotnet-version: "10.0.x"
+
+      # Debug compiles the specifications (#if DEBUG); Release is the strict build that is packed.
+      - name: Build
+        run: dotnet build Grip.slnx --configuration ${{ matrix.configuration }}
+
+      - name: Test
+        if: matrix.configuration == 'Debug'
+        run: dotnet test Grip.slnx --configuration Debug --no-build --logger "console;verbosity=minimal"
+
+      # Packing is what publish.yml does on release; doing it here keeps a pull request from merging a project that
+      # builds but does not pack. Release carries no Debug-only specification dependencies.
+      - name: Pack
+        if: matrix.configuration == 'Release'
+        run: dotnet pack Grip.slnx --configuration Release --no-build -o ./Artifacts/NuGet
+
+  eventmodelers-adapter:
+    name: Eventmodelers adapter
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22.x
+
+      - name: Test
+        working-directory: Docker/eventmodelers
+        run: npm test

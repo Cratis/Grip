@@ -1,0 +1,51 @@
+<Project>
+    <PropertyGroup>
+        <ImplicitUsings>true</ImplicitUsings>
+        <TargetFramework>net11.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+        <RunAnalyzersDuringBuild>True</RunAnalyzersDuringBuild>
+        <RunAnalyzersDuringLiveAnalysis>True</RunAnalyzersDuringLiveAnalysis>
+        <RunAnalyzers>True</RunAnalyzers>
+        <EnableNETAnalyzers>True</EnableNETAnalyzers>
+        <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+
+        <GenerateDocumentationFile>false</GenerateDocumentationFile>
+        <NoWarn>NU1507;CS1591</NoWarn>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)'==''">
+        <Configuration>Debug</Configuration>
+    </PropertyGroup>
+
+    <!--
+        Debug stays lenient so local iteration isn't interrupted by every stray warning.
+        Release is strict: pull request builds (configuration Release) fail on any warning,
+        matching the Cratis framework repositories' convention.
+    -->
+    <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+        <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+        <MSBuildTreatWarningsAsErrors>False</MSBuildTreatWarningsAsErrors>
+        <CodeAnalysisTreatWarningsAsErrors>False</CodeAnalysisTreatWarningsAsErrors>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)'=='Release'">
+        <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+        <MSBuildTreatWarningsAsErrors>True</MSBuildTreatWarningsAsErrors>
+        <CodeAnalysisTreatWarningsAsErrors>True</CodeAnalysisTreatWarningsAsErrors>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="StyleCop.Analyzers" PrivateAssets="All"/>
+        <PackageReference Include="Roslynator.Analyzers" PrivateAssets="All"/>
+        <PackageReference Include="Meziantou.Analyzer" PrivateAssets="All"/>
+    </ItemGroup>
+
+    <!-- StyleCop.Analyzers' SA1200 (using directive placement) reads this file, not the .editorconfig. -->
+    <ItemGroup>
+        <AdditionalFiles Include="$(MSBuildThisFileDirectory)stylecop.json" Link="stylecop.json" Condition="Exists('$(MSBuildThisFileDirectory)stylecop.json')" />
+    </ItemGroup>
+</Project>

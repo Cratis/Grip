@@ -1,0 +1,38 @@
+kitVersion: "1"
+name: node
+version: 1.0.0
+description: Event-sourced Node.js services in TypeScript on the Cratis Chronicle client, specified with Vitest.
+contract:
+  versions: ["1"]
+screenplay:
+  schemaVersions: ">=38"
+sliceTypes: [stateChange, stateView]
+ui: false
+scaffold:
+  path: ./scaffold
+  commands:
+    - npm install
+instructions: ./AGENTS.md
+skills: ./skills
+prompt: ./build-slice.md
+verify:
+  - npx tsc --noEmit
+  - npx vitest run {slice}
+git:
+  branch: "studio/{feature}"
+  commit: "Build {slice}"
+permissions:
+  paths: ["src/**", "package.json", "package-lock.json"]
+  commands:
+    - npm install
+    - npx tsc
+    - npx vitest
+    - git status
+    - git diff
+existingCodebase:
+  learn: ./learn-conventions.md
+  conventions: .cratis/build/conventions.md
+requires:
+  - command: node
+    version: ">=20"
+  - command: npm

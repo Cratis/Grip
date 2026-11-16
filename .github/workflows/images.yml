@@ -1,0 +1,52 @@
+name: Images
+
+# Builds every builder image without publishing it, so a pull request cannot merge a Dockerfile that does not build.
+# publish.yml pushes them on release.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "Docker/**"
+      - "Kits/**"
+      - ".dockerignore"
+      - ".github/workflows/images.yml"
+  pull_request:
+    branches:
+      - "**"
+    paths:
+      - "Docker/**"
+      - "Kits/**"
+      - ".dockerignore"
+      - ".github/workflows/images.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build the builder images
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      # The Axon and Eventmodelers images are built FROM cratis/builder, so the base is built first and tagged as the
+      # version they ask for.
+      - name: Build cratis/builder
+        run: docker build --pull --file Docker/cratis/Dockerfile --tag cratis/builder:ci .
+
+      - name: Check the Cratis CLI in cratis/builder
+        run: docker run --rm cratis/builder:ci --version
+
+      - name: Build cratis/studio-axon-builder
+        run: docker build --build-arg BUILDER_VERSION=ci --file Docker/axon/Dockerfile --tag cratis/studio-axon-builder:ci .
+
+      - name: Build cratis/studio-eventmodelers-builder
+        run: docker build --build-arg BUILDER_VERSION=ci --file Docker/eventmodelers/Dockerfile --tag cratis/studio-eventmodelers-builder:ci .

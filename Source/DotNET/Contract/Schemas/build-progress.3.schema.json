@@ -1,0 +1,45 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:cratis:studio:builders:build-progress:3",
+    "title": "Build progress",
+    "description": "What a builder reports while it builds the order it holds: the step it is on, new log lines and the tokens used so far. Version 3. Studio redacts anything that looks like a credential before it keeps a line, but a builder must never send one.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["contractVersion", "orderId"],
+    "minProperties": 3,
+    "properties": {
+        "contractVersion": { "const": "3" },
+        "orderId": { "type": "string", "format": "uuid", "description": "The order being built." },
+        "step": { "$ref": "#/$defs/text", "description": "What the builder is doing now, in a few words." },
+        "log": {
+            "type": "array",
+            "maxItems": 100,
+            "items": { "$ref": "#/$defs/logLine" },
+            "description": "Log lines written since the previous report, oldest first."
+        },
+        "usage": { "$ref": "#/$defs/usage" }
+    },
+    "$defs": {
+        "text": { "type": "string", "minLength": 1 },
+        "logLine": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["occurred", "level", "text"],
+            "properties": {
+                "occurred": { "type": "string", "format": "date-time" },
+                "level": { "enum": ["information", "warning", "error"] },
+                "text": { "type": "string", "description": "One line. Studio keeps at most 2000 characters of it." }
+            }
+        },
+        "usage": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["inputTokens", "outputTokens"],
+            "description": "The tokens an agent builder has used for this attempt so far, in total.",
+            "properties": {
+                "inputTokens": { "type": "integer", "minimum": 0 },
+                "outputTokens": { "type": "integer", "minimum": 0 }
+            }
+        }
+    }
+}

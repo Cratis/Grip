@@ -1,0 +1,5 @@
+# The images build from the repository root, but only need the Dockerfiles' own folders and the reference kits.
+**
+!Docker/
+!Kits/
+Docker/**/node_modules

@@ -1,0 +1,11 @@
+{
+    "name": "studio-eventmodelers-builder",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "description": "A Studio builder for projects built with the Eventmodelers BuildKit.",
+    "license": "MIT",
+    "scripts": {
+        "test": "node --test *.test.mjs"
+    }
+}

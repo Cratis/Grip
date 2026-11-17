@@ -1,5 +1,5 @@
 {
-  "SourceRevision": "faa9a0713c96d0afcf873beb90462a3461607047",
+  "SourceRevision": "98439d17006617320d732b6eef19c1e880575e2a",
   "Files": [
     {
       "Source": "agents/backend-developer.md",
@@ -24,7 +24,7 @@
     {
       "Source": "agents/frontend-developer.md",
       "Destination": "agents/frontend-developer.md",
-      "Hash": "ABF1A950FEA15EECE6028C6B430E32119275213DFB9E6989FF26C6CA4A7A8A2E"
+      "Hash": "C7ECCC220DCDE823D310E5BA9949FD2DC8A46FE2EF427D30046669847A037024"
     },
     {
       "Source": "agents/orchestrator.md",
@@ -44,7 +44,7 @@
     {
       "Source": "agents/post-mortem.md",
       "Destination": "agents/post-mortem.md",
-      "Hash": "AD7300BC8FCE711D01CC4C2DAD5851296B6FD840CAA9BCE008730494250C3E27"
+      "Hash": "BC3FB349ADFEB45B147F853651BCC12890993CB80DC81D557FD4D1C041180E81"
     },
     {
       "Source": "agents/repository-investigation-reviewer.md",
@@ -294,7 +294,7 @@
     {
       "Source": "harnesses/copilot/instructions/profiles.instructions.md",
       "Destination": "harnesses/copilot/instructions/profiles.instructions.md",
-      "Hash": "28F5DEBE64CD3689EB2A57B4C9945549780CBC278AAC6B197FC0CE7A971FD432"
+      "Hash": "436AB2810D5F93949D1431C4873F24F5D893C6B1C7348743F19F503F5CCDEB67"
     },
     {
       "Source": "harnesses/copilot/instructions/published-contracts.instructions.md",
@@ -414,7 +414,7 @@
     {
       "Source": "harnesses/pi/agents/frontend-developer.md",
       "Destination": "harnesses/pi/agents/frontend-developer.md",
-      "Hash": "D490401593696600140EE645F807B7BC7118804018A89AF3D58A8B0D8F4B8409"
+      "Hash": "A3B2B88EA48CE655D802626A9870ADBF40629AD00C358E19D395D258F035A980"
     },
     {
       "Source": "harnesses/pi/agents/orchestrator.md",
@@ -434,7 +434,7 @@
     {
       "Source": "harnesses/pi/agents/post-mortem.md",
       "Destination": "harnesses/pi/agents/post-mortem.md",
-      "Hash": "4DA9EA3A6118AFF964FB67BC81E24EA9452A0AF1D6612E07E680E28D53F75A03"
+      "Hash": "322EC79E4378B75103B08F2B79D3A387BC38C5D08F34750CF855FB0BD745EF16"
     },
     {
       "Source": "harnesses/pi/agents/repository-investigation-reviewer.md",
@@ -679,7 +679,7 @@
     {
       "Source": "hooks/README.md",
       "Destination": "hooks/README.md",
-      "Hash": "FBA526BDACF64013989319928C256E710B848B725D257CD63AA4D6E38DA0429A"
+      "Hash": "19B866B1377D772B163FADFBF42ED960E454CE0DDD9EB6A282E828299DED3BAD"
     },
     {
       "Source": "hooks/agent-stop.md",
@@ -729,7 +729,7 @@
     {
       "Source": "hooks/scripts/cratis-guard-writes.sh",
       "Destination": "hooks/scripts/cratis-guard-writes.sh",
-      "Hash": "A098908226558CC493122D2C4B3A3D5F92F99D6405508B507A5C7EA7C4310A9C"
+      "Hash": "A19C428E24EFD5AE90B942C4A74B3660C36D9CF1906496A73B9D530A5C2B3F32"
     },
     {
       "Source": "hooks/scripts/cratis-nuget-pins.txt",
@@ -1004,7 +1004,7 @@
     {
       "Source": "rules/general.md",
       "Destination": "rules/general.md",
-      "Hash": "28791D1574FE02FF12E76654B281F0A6AD79C90AB5AC8F6F4FE5C372EF970957"
+      "Hash": "A54A056A8AEDB4452F21E6556584B701719E20E2C4D4173F275DA88854631037"
     },
     {
       "Source": "rules/git-commits.md",
@@ -1069,7 +1069,7 @@
     {
       "Source": "rules/profiles.md",
       "Destination": "rules/profiles.md",
-      "Hash": "521F0E6F4F93F1AAAA5EC5BCFE7582D554B7AF94E3EE8673A403E78ADA4C0167"
+      "Hash": "BA6E6322CC6E8D7316BC87C61AD259175C25D7BBC930E3F27F28FCC84AB809CA"
     },
     {
       "Source": "rules/published-contracts.md",
@@ -1199,12 +1199,12 @@
     {
       "Source": "skills/check-bin-obj-clash/NOTICE",
       "Destination": "skills/check-bin-obj-clash/NOTICE",
-      "Hash": "29DE7390DF444E3CADEA0162C2679024579A6FA3897D4675D62DFEB84C186ACC"
+      "Hash": "17901E316CC5E9EEC1A47C7075F009781BC2A719F1D248B5D405670889266A15"
     },
     {
       "Source": "skills/check-bin-obj-clash/SKILL.md",
       "Destination": "skills/check-bin-obj-clash/SKILL.md",
-      "Hash": "64559D90114DB7AAEFE9B2A0778E60ED68FDCC05DF0E5B3950E1AD39462D2F86"
+      "Hash": "3B202CC9102F5FA92DECFCA617A605974B63FDED38827F7D7510EA5F14D1B644"
     },
     {
       "Source": "skills/check-bin-obj-clash/references/common-causes-and-fixes.md",
@@ -1739,7 +1739,7 @@
     {
       "Source": "skills/cratis-engineering-post-mortem/SKILL.md",
       "Destination": "skills/cratis-engineering-post-mortem/SKILL.md",
-      "Hash": "8C1D406AF397BB01FC02260DCC64170FF034F6D34B312E62ADCBCC22018C54B4"
+      "Hash": "38DC655648EEB50151B9163135ED7D061A11F172EABA1AE7B871E8E0FA142D38"
     },
     {
       "Source": "skills/cratis-engineering-post-mortem/references/examples/silent-backup-failure.md",
@@ -2446,7 +2446,7 @@
     },
     {
       "Path": ".claude/CLAUDE.md",
-      "Target": "../.cratis/ai/rules/general.md",
+      "Target": "../.cratis/ai/rules/project.md",
       "IsDirectory": false,
       "PreserveExisting": true
     },
@@ -2710,7 +2710,7 @@
     },
     {
       "Path": ".github/copilot-instructions.md",
-      "Target": "../.cratis/ai/rules/general.md",
+      "Target": "../.cratis/ai/rules/project.md",
       "IsDirectory": false,
       "PreserveExisting": true
     },
@@ -2872,13 +2872,13 @@
     },
     {
       "Path": "AGENTS.md",
-      "Target": ".cratis/ai/rules/general.md",
+      "Target": ".cratis/ai/rules/project.md",
       "IsDirectory": false,
       "PreserveExisting": true
     },
     {
       "Path": "CLAUDE.md",
-      "Target": ".cratis/ai/rules/general.md",
+      "Target": ".cratis/ai/rules/project.md",
       "IsDirectory": false,
       "PreserveExisting": true
     }
